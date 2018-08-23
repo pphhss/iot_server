@@ -10,7 +10,7 @@ var fcm = new FCM(serverKey);
 
 var send = function(to,data){
   var pushpush = {
-    to:"c6782D2Lqeg:APA91bG2i4cpYh3uL54Z5qsoI2t83WfdIrCF7qpU5JESsA6ETSIaPQzOh5NGYVsqQhuNS8wlr0Pkj7tUwZHBWdLQzPKepWZ1CAGneaa8nf7HZ71_naAedGy3wRYCjIyla2ua-fcgPpptTGk2t-Kx0qtZA-MRCbZbew",
+    to:to,
 
     notification:{
       title:"ddddddddddd",

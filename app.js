@@ -11,70 +11,23 @@ var app = express();
 
 var fs = require('fs');
 
-var net = require('net');
+var config = require('./config');
 
-var FCM = require('./FCM/fcm');
-
-var name = "";
-
-var socketServer = net.createServer(function(conn){
-  console.log("client connect!");
-
-  var d = new Date();
-
-  var b = d.toString().replace(":","m").replace(":","m");
-
-  var c = b.split(" ");
-  var a="";
+// socket
+var socketServer = require('./socket/socket');
 
 
 
-  var i=0;
-  for(i;i<5;i++){
-    a = a+c[i];
-  }
-
-
-  conn.on('close',function(){
-    console.log("disconnect");
-  });
-
-  conn.on('data',function(data){
-    //console.log("CLient : "+data.toString());
-
-    var sData = data.toString();
-
-    if(sData.includes("^DATA^")){
-      // if it is DATA
-
-      var real_data = JSON.parse(sData.split("^DATA^")[1]);
-
-      console.log(real_data);
-
-      name = real_data.name;
-
-
-
-    }
-
-    else{
-      // if it is IMAGE
+global.FCM = require('./FCM/fcm');
+global.DB = require('./database/database').intance();
 
 
 
 
-      var buf = new Buffer(sData,'base64');
-
-      console.log(buf.length);
-      fs.appendFileSync('./public/images/'+name+a+'.png',data);
-    }
 
 
-    //conn.write(data.toString());
-  });
-});
 
-socketServer.listen(8080,function(){
+socketServer.listen(config.socket.port,function(){
   console.log("socket open!");
 });
 
@@ -86,6 +39,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 
