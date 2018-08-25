@@ -18,7 +18,7 @@ var socketServer = require('./socket/socket');
 
 
 
-global.FCM = require('./FCM/fcm');
+global.FM = require('./FCM/fcm');
 global.DB = require('./database/database').intance();
 
 

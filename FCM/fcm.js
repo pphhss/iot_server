@@ -5,29 +5,51 @@ var serverKey = "AAAA2EKtLDM:APA91bEQfAOIZEkbBgFgYdh-ZFQDHqOIB_RqNy5rrx74KE6MpYd
 
 var fcm = new FCM(serverKey);
 
-
-
-
-var send = function(to,data){
-  var pushpush = {
+function Type0(to,data,notification){
+  this.pushpush = {
     to:to,
 
     notification:{
-      title:"ddddddddddd",
-      body: "ajnskdjnaksdjnajksnd",
-      sound:"defalut",
-      click_action:"FCM_PLUGIN_ACTIVITY",
+      title: notification.title,
+      body: notification.body,
+      sound: "default",
+      click_action: ".ConsentTypeZeroActivity",
       icon: "fcm_push_icon"
+    },
+    data:{
+      type: "0",
+      name: data.name,
+      temperature: data.temperature,
+      heartrate: data.heartrate,
+      symptominfo: data.symptominfo,
+      curdisease: data.curdisease,
+      title: notification.title,
+      body: notification.body
     }
   };
-  fcm.send(pushpush,function(err,res){
-    if(err){
-      console.log("ERR fcm send");
-    }else{
-      console.log("Success : "+res);
-    }
-  });
+}
+Type0.prototype.send = function(){
+  console.log(this.pushpush);
+  fcm.send(this.pushpush,function(err,res){
+  if(err){
+    throw err;
+  }
+  console.log(res);
 
+});
 };
 
-module.exports.send = send;
+
+
+var fcmManager = {};
+
+fcmManager.getType0 = function(to,data,notification){
+  console.log("FCM");
+  console.log(to);
+  console.dir(data);
+  console.dir(notification);
+  return new Type0(to,data,notification);
+};
+
+
+module.exports = fcmManager;
