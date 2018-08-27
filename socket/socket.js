@@ -6,6 +6,9 @@ var fs = require('fs');
 var iTime = "";
 var sid_checK_drug = 0;
 var socketServer = net.createServer(function(conn){
+    var img_sid;
+    var img_url;
+    var img_flag = 0;
     console.log("client connect!");
     
     
@@ -13,6 +16,40 @@ var socketServer = net.createServer(function(conn){
 
     conn.on('close',function(){
     console.log("disconnect");
+    if(img_flag==1){ // send image to android.
+        DB.getConnection(function(conn){
+
+            //get token result.
+            conn.query("SELECT p.token,s.result FROM symptominfo_result as s, vendingmachine as v, pharmacist as p WHERE s.sid = ? AND s.vid = v.vid AND v.pid = p.pid",[img_sid],function(err,results){
+                if(err){
+                    throw err;
+                }
+
+                var to = results[0].token;
+                var result = results[0].result;
+
+                // get customer's name.
+                conn.query("SELECT c.name FROM symptominfo_result as s,customer as c WHERE s.sid = ? AND s.cid = c.cid",[img_sid],function(err,results){
+                    var name = results[0].name;
+                    var notification ={
+                        title: "처방 확인",
+                        body: name+"님의 처방"
+                    }
+                    var data = {
+                        name: name,
+                        result: result,
+                        imageurl: img_url,
+                        sid: img_sid
+                    }
+                    var type1 = FM.getType1(to,data,notification);
+                    type1.send();
+                    img_flag = 0;
+                    conn.release();
+                });
+            });
+        });
+        
+    }
     });
 
     conn.on('data',function(data){
@@ -90,7 +127,8 @@ var socketServer = net.createServer(function(conn){
                                     temperature: temperature.toString(),
                                     heartrate: heartrate.toString(),
                                     symptominfo: symptominfo,
-                                    curdisease: curdisease
+                                    curdisease: curdisease,
+                                    sid:(maxSid+1).toString()
                                 };
 
                                 var notification = {
@@ -149,6 +187,9 @@ var socketServer = net.createServer(function(conn){
                       if(err){
                            throw err;
                         }  
+
+                        
+
                         conn.release();
                   });
                 
@@ -176,6 +217,10 @@ var socketServer = net.createServer(function(conn){
 
         console.log(buf.length);
         fs.appendFileSync('./public/images/'+sid_checK_drug+iTime+'.png',data);
+        
+        img_flag=1;
+        img_sid = sid_checK_drug;
+        img_url = "http://192.168.219.165:3000/public/images/"+sid_checK_drug+iTime+".png"
     }
 
 

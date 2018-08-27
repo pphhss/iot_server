@@ -4,34 +4,26 @@ var db = require('./database/database').intance();
 
 var fm = require('./FCM/fcm');
 
-a=1;
 
-b = {
-    hello:"안녕하세요",
-    number:a
-}
-console.log(b);
-/*
+
 db.getConnection(function(conn){
     conn.query("SELECT token FROM pharmacist WHERE id=?",["hello"],function(err,results){
         var to = results[0].token;
 
         var data = {
             name:"phs",
-            temperature:"36.55",
-            heartrate:"50",
-            symptominfo:"bad..",
-            curdisease:"none"
+            result:"good",
+            imageurl:"http://192.168.219.165:3000/public/images/parkSunAug19201801m19m36.png",
+            sid:"1"
         };
-
         var notification = {
             title: "phs request",
             body: "hello doctor!"
         };
 
-        var type0 = fm.getType0(to,data,notification);
+        var type1 = fm.getType1(to,data,notification);
         
-        type0.send();
+        type1.send();
 
 
         conn.release();

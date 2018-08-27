@@ -23,6 +23,7 @@ function Type0(to,data,notification){
       heartrate: data.heartrate,
       symptominfo: data.symptominfo,
       curdisease: data.curdisease,
+      sid: data.sid,
       title: notification.title,
       body: notification.body
     }
@@ -39,6 +40,40 @@ Type0.prototype.send = function(){
 });
 };
 
+function Type1(to,data,notification){
+  this.pushpush = {
+    to:to,
+
+    notification:{
+      title: notification.title,
+      body: notification.body,
+      sound: "default",
+      click_action: ".ConsentTypeOneActivity",
+      icon: "fcm_push_icon"
+    },
+    data:{
+      type: "1",
+      name: data.name,
+      result: data.result,
+      imageurl: data.imageurl,
+      sid: data.sid,
+      title: notification.title,
+      body: notification.body
+    }
+  };
+}
+Type1.prototype.send = function(){
+  console.log(this.pushpush);
+  fcm.send(this.pushpush,function(err,res){
+  if(err){
+    throw err;
+  }
+  console.log(res);
+
+});
+};
+
+
 
 
 var fcmManager = {};
@@ -51,5 +86,8 @@ fcmManager.getType0 = function(to,data,notification){
   return new Type0(to,data,notification);
 };
 
+fcmManager.getType1 = function(to,data,notification){
+  return new Type1(to,data,notification);
+}
 
 module.exports = fcmManager;

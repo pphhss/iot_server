@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var net = require('net');
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -40,6 +41,73 @@ router.post('/loginAction',function(req,res,next){
         
       });
     });
+});
+
+router.post('/reactType0',function(req,res){
+  var result = req.body.result;
+  var sid = req.body.sid;
+
+  DB.getConnection(function(conn){
+    conn.query("UPDATE symptominfo_result SET result = ? WHERE sid = ?",[result,parseInt(sid)],function(err,results){
+      if(err){
+        throw err;
+      }
+      conn.release();
+    });
+  });
+
+  var client = net.connect(8080,"192.168.219.191",function(){
+    console.log("192.168.219.191 connect!" );
+
+    client.on('err',function(err){
+      console.log(err);
+    });
+  });
+  client.write(result);
+  client.end();
+
+  res.send("good!");
+ /*
+  //send Artik a data
+
+ 
+
+ */ 
+
+});
+
+router.post('/reactType1',function(req,res){
+  var checkpic = req.body.result;
+  var sid = req.body.sid;
+
+  DB.getConnection(function(conn){
+    conn.query("UPDATE check_drug SET checkpic = ? WHERE sid = ?",[parseInt(checkpic),parseInt(sid)],function(err,results){
+      if(err){
+        throw err;
+      }
+
+      var client = net.connect(8080,"192.168.219.191",function(){
+        console.log("192.168.219.191 connect!" );
+    
+        client.on('err',function(err){
+          console.log(err);
+        });
+      });
+      client.write(checkpic);
+      client.end();
+    
+      res.send("good!");
+      conn.release();
+
+     
+      /*
+        send artik..
+        
+        
+      */
+      
+    });
+  });
 });
 
 module.exports = router;
